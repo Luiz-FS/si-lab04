@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt" ng-app="agendaDeTarefas">
+
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Agenda de tarefas</title>
+        <link rel="icon" type="image/ico" href="./css/icone.ico"/>
+
+        <script src="./js/frameworks/angular.js"></script>
+        <script src="./js/frameworks/jquery.js"></script>
+        <script src="./js/frameworks/bootstrap.js"></script>
+        <script src="./js/app.js"></script>
+        <script src="./js/controlador/tela-controller.js"></script>
+        <script src="./js/controlador/menu-controller.js"></script>
+
+        <link rel="stylesheet" href="./css/bootstrap.css"/>
+        <link rel="stylesheet" href="./css/style.css"/>
+        <link rel="stylesheet" href="./css/style-menu.css"/>
+        <link rel="stylesheet" href="./css/glyphicon.css"/>
+
+    </head>
+
+    <body ng-controller="agendaDetarefasCtrl" id="palnoDeFundo">
+
+        <div id="interface">
+
+            <nav id="menuFixado">
+
+                <h1 class="titulo">{{app}}</h1>
+
+                <ul id="menu">
+                    <li><a href="/">Home</a></li>
+                    <li>
+                    	<div id="menuEdicao">
+                    		<button id="editacaoListaBtn">Editar</button>
+                    		<div id="caixaEdicao">
+                    			
+                    			<button class="acordeon alteraLista">Adicionar Lista de Tarefas</button>
+                    			<div class="painel">
+                    				<input type="text" class="form-control txtNome" ng-model="listaDeTarefas.nome" placeholder="Nome da lista..."/>
+                    				<button class="cancelar" ng-click="listaDeTarefas.nome = null">Cancelar</button>
+                    				<button class="salvar" ng-click="adicionarNovaLista(listaDeTarefas)" style="margin-right: 5px;">Adicionar</button>
+                    			</div>
+                    			
+                    			<button class="acordeon alteraLista">Editar nome da lista</button>
+                    			<div class="painel">
+                    				<input type="text" class="form-control txtNome" ng-model="novoNome" placeholder="Novo nome da lista..."/>
+                    				<button class="cancelar" ng-click="novoNome = null">Cancelar</button>
+                    				<button class="salvar" ng-click="alterarNomeDaLista(novoNome)" style="margin-right: 5px;">Salvar</button>
+                    			</div>
+                    			<button class="acordeon" ng-click="deletarListaTarefas(listaDeTarefasSelecionada)">Remover lista atual</button><br/>
+                    			<button class="acordeon" ng-click="deletarTodasAsListas()">Remover Todas as listas</button>
+
+                    		</div>
+                    	</div>
+                    </li>
+                    <li>
+                        <div id="progresso">
+                            <button id="progressoBtn">Progresso</button>
+                            <div id="progressoEst">
+                                <p style="margin: 7px">Total de tarefas a serem concluidas: {{calcQunatTarefasInconcluidas()}}</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <a id="baixarLista" style="cursor: pointer">Download</a>
+                    </li>
+                    <li><a href="https://github.com/Luiz-FS/si-lab03" target="_blank">Sobre</a></li>
+                </ul>
+
+            </nav>
+
+            <div class="jumbotron">
+            
+            	<h2 id="nomeLista">{{listaDeTarefasSelecionada.nome}}</h2>
+
+                <div>
+
+					<form novalidate="novalidate" name="formTarefa">
+					
+                    	<input class="form-control txtTarefa" type="text" name="txtDescricao" ng-model="tarefa.descricao" placeholder="Tarefa..." ng-required="true"/>
+                    	<input class="form-control txtTarefa" type="text" ng-model="tarefa.comentario" placeholder="Descrição da tarefa..."/>
+
+						<select class="form-control prioridade" ng-model="tarefa.prioridade" ng-options="prioridade for prioridade in prioridades" ng-required="true">	
+
+                        	<option value="">Prioridade...</option>
+
+                    	</select>
+                    	
+                    	
+                    	
+                    	<div class="botoes">
+                    		<button class="btn btn-primary btn-block adicionar" ng-click="adicionaTarefa(tarefa)" ng-disabled="formTarefa.$invalid">Adicionar Tarefa</button>
+                    		<button class="btn btn-danger btn-block" ng-click="limparTarefas()">Limpar Tarefas</button>
+                    	</div>
+                    	
+                    	<input class="form-control categoria" type="text" ng-model="tarefa.categoria" placeholder="Categoria da tarefa..."/>
+                    </form>
+
+                </div>
+
+                <div id="controladorDeTarefas">
+                
+                	<select class="form-control listas" ng-model="listaDeTarefasSelecionada" ng-click="atualizaCategorias()" ng-options="lista.nome for lista in listasDeTarefas" ng-required="true">	
+
+                    	<option value="" disabled="disabled">Listas de tarefas...</option>
+
+                  	</select>
+
+                    <div>
+                        <input class="form-control busca" type="text" ng-model="criterioDeBusca" placeholder="O que você está buscando?"/>
+
+                        <select class="form-control filtro" ng-model="select" ng-options="filtro.filtro for filtro in tableFilter">
+
+                            <option value="" disabled="disabled">Filtrar por conclusão...</option>
+
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 10px; margin-top: 55px">
+
+                        <select class="form-control ordenar" ng-model="ordenarPor" ng-click="selecionarOrdenacao()">
+
+                            <option value="ordenar" selected="selected" disabled="disabled">Ordenar por...</option>
+                            <option label="Prioridade" value="prioridade">Prioridade</option>
+                            <option label="Nome" value="descricao">Nome</option>
+
+                        </select>
+
+                        <select class="form-control filtroCateg" ng-model="selCategoria" ng-options="categoria for categoria in categorias">
+
+                            <option value="" disabled="disabled">Filtrar por categoria...</option>
+
+                        </select>
+                    </div>
+
+                    <div class="estatisticas">
+                        <span style="margin-right: 70px">Tarefas concluidas: {{calculaQuantTarefasFiltro(selCategoria, true)}}</span> <span>Tarefas não concluidas: {{calculaQuantTarefasFiltro(selCategoria, false)}}</span>
+                    </div>
+
+                    <div id="caixa">
+
+                        <div id="sombreado" ng-repeat="tarefa in listaDeTarefasSelecionada.tarefas | filter:{descricao:criterioDeBusca}
+                            | filter:{concluida:filtroTarefas(select)} | filter:{categoria:filtroCategorias(selCategoria)} | orderBy:ordenarPor:false:ordenar">
+
+                            <div ng-class="{concluida: tarefa.concluida, naoConcluida: !tarefa.concluida}">
+
+                                <div id="checkeBox" ng-click="marcarOudesmarcarConcluida(tarefa)"><span class="glyphicon glyphicon-ok" ng-show="tarefa.concluida"></span></div>
+
+                                <div id="nomeTarefa" ng-click="abrirTarefa(tarefa)">
+                                    <p id="descricao">{{tarefa.descricao}}</p>
+                                </div>
+
+                                <span style="float: right; margin: 13px 10px auto">{{tarefa.prioridade}}</span>
+
+                            </div>
+
+                            <div id="lixeira" ng-click="remove(tarefa)">
+                                <span class="glyphicon glyphicon-trash remover"></span>
+                            </div>
+
+                        </div>
+
+                        <p id="tarefasVazias" ng-show="listaDeTarefasSelecionada.tarefas.length == 0">Não há tarefas a serem realizadas</p>
+
+                    </div>
+
+                </div>
+               
+                <div class="text-xs-center" id="example-caption-6">Progresso das tarefas&hellip; {{calculaPorcentagem(listaDeTarefasSelecionada.tarefas) + "%"}}</div>
+                <div id="progressBar">
+
+                    <div id="progressConcluida" style="{{'width:' + calculaPorcentagem(listaDeTarefasSelecionada.tarefas) + '%'}}"></div>
+                    <div id="progressNaoOcncluida" style="{{'width:' + (MAXIMO_PERCENTUAL - calculaPorcentagem(listaDeTarefasSelecionada.tarefas)) + '%'}}"></div>
+
+                </div>
+
+            </div>
+
+            <footer>
+                <h5 class="creditos">Copyright © Luiz Fernando da Silva</h5>
+            </footer>
+            
+        </div>
+
+        <div id="tarefa-visualizacao" class="visualizacao">
+
+            <div class="caixa-dialogo">
+
+                <div class="titulo-dialogo">
+
+                    <span class="fechar">&times;</span>
+                    <h2>Gerenciador de Tarefa</h2>
+
+                </div>
+
+                <div class="corpo-texto">
+
+                    <p>
+                    	<span class="atributo">Tarefa: </span>
+                    	<span ng-show="!modoEdicao">{{tarefaAtual.descricao}}</span>
+                    	<input type="text" ng-model="tarefaAtual.descricao" ng-show="modoEdicao"/>
+                    </p>
+                    
+                     <p>
+                    	<span class="atributo">Descrição: </span>
+                    	<span  ng-show="!modoEdicao">{{tarefaAtual.comentario}}</span>
+                    	<input type="text" ng-model="tarefaAtual.comentario" ng-show="modoEdicao"/>
+                    </p>
+                    
+                    <p>
+                    	<span class="atributo">Prioridade: </span>
+                    	<span  ng-show="!modoEdicao">{{tarefaAtual.prioridade}}</span>
+                    	
+                    	<select class="form-control" ng-model="tarefaAtual.prioridade" ng-options="prioridade for prioridade in prioridades" ng-show="modoEdicao"
+                    	style="width: 130px; display: inline-block;">	
+
+                        	<option value="">Prioridade...</option>
+
+                    	</select>
+                    </p>
+                    
+                    <p>
+                    	<span class="atributo">Sub-Tarefas: </span>
+                    	<input type="text" class="form-control addSubTarefa" ng-model="subtarefa.descricao" placeholder="Nome da SubTarefa..."/>
+                    	<button class="salvar" ng-click="adicionarSubTarefa(tarefaAtual, subtarefa)">Adicionar</button>
+                    	<button class="cancelar" ng-click="subtarefa.descricao = null">Cancelar</button>
+                    </p>
+                    
+                    <div id="caixa-subtarefas">
+                    		
+                    	<table id="tabelaSubtarefas">
+                    		
+                    		<tr>
+                    			<th style="width: 76%;">Nome</th>
+                    			<th>Concluida</th>
+                    			<th>Deletar</th>
+                    		</tr>
+                    			
+                    		<tr ng-repeat="subtarefa in tarefaAtual.subTarefas">
+                    			
+                    			<td>{{subtarefa.descricao}}</td>
+                    			<td style="text-align: center;"><input type="checkbox" style="width: 15px; height: 15px;" ng-model="subtarefa.concluida" ng-click="alterarSubTarefa(tarefaAtual, subtarefa)"/></td>
+                    			<td><button class="cancelar" ng-click="deletarSubTarefa(tarefaAtual, subtarefa)">Deletar</button></td>
+                    		</tr>
+                    		
+                    	</table>
+                    		
+                    </div>
+                    
+                    <p>
+                    	<span class="atributo">Concluida: </span>
+                    	<input type="checkbox" style="width: 15px; height: 15px;" ng-model="tarefaAtual.concluida" ng-click="marcarSubtarefasConcluidas(tarefaAtual, tarefaAtual.concluida)" ng-disabled="!modoEdicao"/>
+                    </p>
+                    
+                    <p>
+                    	<span class="atributo">Categoria: </span>
+                    	<span  ng-show="!modoEdicao">{{tarefaAtual.categoria}}</span>
+                    	<input type="text" ng-model="tarefaAtual.categoria" ng-show="modoEdicao"/>
+                    </p>
+
+                    <div id="botoes">
+
+                        <button class="editar" ng-click="editarTarefa()">Editar</button>
+                        <button class="salvar" ng-click="salvarEdicao(tarefaAtual)">Salvar</button>
+                        <button class="cancelar" ng-click="cancelarEdicao()">Cancelar</button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        
+		<script src="./js/controlador/menu-controller.js"></script>
+		
+    </body>
+</html>
