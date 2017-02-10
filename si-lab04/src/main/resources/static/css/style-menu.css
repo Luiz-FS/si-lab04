@@ -1,0 +1,169 @@
+#menuFixado {
+	position: fixed;
+	width: 950px;
+	z-index: 1;
+	box-shadow: 0 3px 3px #6b6b6b;
+}
+
+.titulo {
+
+    background-color: #003dfd;
+    text-align: center;
+    font-size: 43px;
+
+    padding-top: 1px;
+    padding-bottom: 10px;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 0;
+}
+
+
+#menu {
+
+    background-color: #00d7ff;
+    margin: 0px;
+    list-style-type: none;
+}
+
+#menu li {
+    display: inline;
+    margin-right: 10px;
+}
+
+#menu li a {
+
+    text-decoration: none;
+    color: black;
+}
+
+#menuEdicao {
+	position: relative;
+	display: inline-block;
+}
+
+#editacaoListaBtn {
+	
+	background-color: #00d7ff;
+    color: black;
+	padding: 10px;
+	cursor: pointer;
+	font-size: 16px;
+	border: none;
+	outline: none;
+}
+
+#caixaEdicao {
+	
+	position: fixed;
+	background-color: #f9f9f9;
+	min-width: 160px;
+	max-width: 253px;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.4s ease-out;
+}
+
+#menuEdicao:hover #caixaEdicao {
+	
+	max-height: 388px;
+}
+
+@keyframes editacaoListaAn {
+	from {background-color: #00d7ff;}
+	to{background-color: #eee;}
+}
+
+#menuEdicao:hover #editacaoListaBtn {
+	background-color: #eee;
+}
+
+.txtNome {
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+
+button.acordeon {
+	
+	background-color: #eee;
+	color: #444;
+	cursor: pointer;
+	padding: 15px;
+	width: 100%;
+	text-align: left;
+	border: none;
+	outline: none;
+	transition: 0.4s;
+}
+
+button.acordeon.ativo, button.acordeon:hover {
+	background-color: #ddd;
+}
+
+div.painel {
+	padding: 0 18px;
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.2s ease-out;
+}
+
+div.painel button {
+	float: right;
+	margin-bottom: 5px;
+}
+
+button.alteraLista {
+	box-shadow: 0px 3px 3px 0px rgba(0,0,0,0.7);
+}
+
+button.alteraLista:after {
+	content: '\02795'; /*Caractere (+) no código unicode*/
+	font-size: 13px;
+	color: #777;
+	float: right;
+	margin-left: 5px;
+}
+
+button.alteraLista.ativo:after {
+	content: "\2796"; /*Caractere (-) no código unicode*/
+}
+
+#progressoBtn {
+
+	background-color: #00d7ff;
+	color: black;
+	padding: 10px;
+	cursor: pointer;
+	font-size: 16px;
+	border: none;
+	outline: none;
+}
+
+#progresso {
+	position: relative;
+	display: inline-block;
+}
+
+#progressoEst {
+
+	position: fixed;
+	background-color: #f9f9f9;
+	min-width: 160px;
+	max-width: 253px;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	z-index: 1;
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.4s ease-out;
+}
+
+#progresso:hover #progressoEst {
+
+	max-height: 60px;
+}
+
+#progresso:hover #progressoBtn {
+	background-color: #f9f9f9;
+}
