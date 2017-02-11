@@ -444,8 +444,31 @@ app.controller("agendaDetarefasCtrl", function ($scope, $http) {
 
 	download.onclick = function () {
 
-        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify($scope.listaDeTarefasSelecionada));
-        this.setAttribute("href", dataStr);
-        this.setAttribute("download", "lista-" + $scope.listaDeTarefasSelecionada.nome +  ".json");
+        var docDefinition = { content: criaStringPdf() };
+
+        pdfMake.createPdf(docDefinition).download($scope.listaDeTarefasSelecionada.nome + '.pdf');
+    }
+
+    function criaStringPdf() {
+
+		var saida = "Lista: " + $scope.listaDeTarefasSelecionada.nome + "\n"
+					+ "----Tarefas:\n";
+
+		for (var i = 0; i < $scope.listaDeTarefasSelecionada.tarefas.length; i++) {
+
+			var tarefa = $scope.listaDeTarefasSelecionada.tarefas[i];
+
+			saida += "----" + tarefa.descricao + "\n"
+					+ "--------Subtarefas:\n";
+
+			for (var j = 0; j < tarefa.subTarefas.length; j++) {
+
+				var subTarefa = tarefa.subTarefas[j];
+
+				saida += "--------" + subTarefa.descricao + "\n";
+			}
+		}
+
+		return saida;
     }
 });
